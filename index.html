@@ -13,39 +13,16 @@
         }
         .container {
             display: flex;
+            flex-direction: column;
             height: 100%;
+            max-width: 800px;
+            margin: 0 auto;
         }
         header {
             background-color: #007bff;
             color: white;
             padding: 10px 20px;
             text-align: center;
-        }
-        .sidebar {
-            width: 200px;
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-right: 1px solid #dee2e6;
-        }
-        .sidebar h3 {
-            margin-top: 0;
-        }
-        .sidebar ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        .sidebar li {
-            margin-bottom: 10px;
-        }
-        .sidebar a {
-            text-decoration: none;
-            color: #007bff;
-        }
-        .main-content {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
         }
         #chat-container {
             flex-grow: 1;
@@ -57,6 +34,7 @@
         }
         .input-area {
             display: flex;
+            margin-bottom: 20px;
         }
         #user-input {
             flex-grow: 1;
@@ -87,75 +65,63 @@
     </style>
 </head>
 <body>
-    <header>
-        <h1>AI Customer Support</h1>
-    </header>
     <div class="container">
-        <div class="sidebar">
-            <h3>Quick Links</h3>
-            <ul>
-                <li><a href="#">FAQ</a></li>
-                <li><a href="#">Contact Us</a></li>
-                <li><a href="#">Product Info</a></li>
-                <li><a href="#">Returns Policy</a></li>
-            </ul>
-        </div>
-        <div class="main-content">
-            <div id="chat-container"></div>
-            <div class="input-area">
-                <input type="text" id="user-input" placeholder="Type your message here...">
-                <button id="send-btn">Send</button>
-            </div>
+        <header>
+            <h1>AI Customer Support</h1>
+        </header>
+        <div id="chat-container"></div>
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Type your message here...">
+            <button id="send-btn">Send</button>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
     <script>
         const chatContainer = document.getElementById('chat-container');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
 
-        // Replace 'your-api-key-here' with your actual OpenAI API key
-        const OPENAI_API_KEY = process.env.OPENAI_API_KEY
-        
+        // Simulated AI responses
+        const aiResponses = [
+            "Hello! How can I assist you today?",
+            "I'm sorry to hear you're having trouble. Could you please provide more details about the issue?",
+            "Thank you for providing that information. Have you tried restarting the device?",
+            "I understand your frustration. Let me check our knowledge base for a solution.",
+            "Based on what you've described, it seems like this might be a known issue. We have a fix available.",
+            "Is there anything else I can help you with today?",
+            "I'm glad I could assist you. Don't hesitate to reach out if you have any more questions!"
+        ];
+
+        let conversationHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
+
         function addMessage(sender, message) {
             const messageElement = document.createElement('div');
             messageElement.className = `message ${sender.toLowerCase()}-message`;
             messageElement.textContent = message;
             chatContainer.appendChild(messageElement);
             chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            // Save to conversation history
+            conversationHistory.push({ sender, message });
+            localStorage.setItem('chatHistory', JSON.stringify(conversationHistory));
         }
 
-        async function sendMessage() {
+        function getAIResponse() {
+            // In a real implementation, this would call an API
+            return aiResponses[Math.floor(Math.random() * aiResponses.length)];
+        }
+
+        function sendMessage() {
             const message = userInput.value.trim();
             if (message) {
                 addMessage('user', message);
                 userInput.value = '';
 
-                try {
-                    const response = await axios.post(
-                        'https://api.openai.com/v1/chat/completions',
-                        {
-                            model: 'gpt-3.5-turbo',
-                            messages: [
-                                { role: 'system', content: 'You are a helpful customer support assistant.' },
-                                { role: 'user', content: message }
-                            ]
-                        },
-                        {
-                            headers: {
-                                'Authorization': `Bearer ${OPENAI_API_KEY}`,
-                                'Content-Type': 'application/json'
-                            }
-                        }
-                    );
-
-                    const aiResponse = response.data.choices[0].message.content;
+                // Simulate AI response delay
+                setTimeout(() => {
+                    const aiResponse = getAIResponse();
                     addMessage('ai', aiResponse);
-                } catch (error) {
-                    console.error('Error:', error);
-                    addMessage('ai', 'Sorry, I encountered an error. Please try again later.');
-                }
+                }, 1000);
             }
         }
 
@@ -166,8 +132,13 @@
             }
         });
 
-        // Initial greeting
-        addMessage('ai', 'Hello! Welcome to our AI Customer Support. How can I assist you today?');
+        // Load conversation history
+        conversationHistory.forEach(msg => addMessage(msg.sender, msg.message));
+
+        // Initial greeting if no history
+        if (conversationHistory.length === 0) {
+            addMessage('ai', "Hello! Welcome to our AI Customer Support. How can I assist you today?");
+        }
     </script>
 </body>
 </html>
