@@ -4,94 +4,131 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SupportSage AI Assistant</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #818cf8;
+            --background-color: #f9fafb;
+            --text-color: #111827;
+            --chat-bg: #ffffff;
+        }
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f0f4f8;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
             margin: 0;
             padding: 0;
+            color: var(--text-color);
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: #333;
+            min-height: 100vh;
         }
-        .chat-container {
-            width: 400px;
-            height: 600px;
-            background-color: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        .dashboard {
             display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
-        .chat-header {
-            background-color: #3498db;
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary-color);
             color: white;
             padding: 20px;
-            text-align: center;
-            font-weight: 500;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+        .nav-item {
+            padding: 10px 15px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .nav-item:hover {
+            background-color: var(--secondary-color);
+        }
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background-color: white;
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+        }
+        .chat-container {
+            flex-grow: 1;
+            background-color: var(--chat-bg);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            display: flex;
+            flex-direction: column;
+            max-width: 800px;
+            margin: 0 auto;
         }
         .chat-messages {
             flex-grow: 1;
             padding: 20px;
             overflow-y: auto;
-            background-color: #f8f9fa;
+            max-height: 500px;
         }
         .message {
             margin-bottom: 15px;
             padding: 10px 15px;
-            border-radius: 18px;
+            border-radius: 8px;
             max-width: 80%;
-            line-height: 1.4;
-            position: relative;
-            font-size: 14px;
+            line-height: 1.5;
         }
         .user-message {
-            background-color: #3498db;
+            background-color: var(--primary-color);
             color: white;
             align-self: flex-end;
             margin-left: auto;
-            border-bottom-right-radius: 0;
         }
         .bot-message {
-            background-color: #e9ecef;
+            background-color: #f3f4f6;
             align-self: flex-start;
-            border-bottom-left-radius: 0;
         }
         .chat-input {
             display: flex;
             padding: 15px;
             background-color: white;
-            border-top: 1px solid #e9ecef;
+            border-top: 1px solid #e5e7eb;
         }
         #user-input {
             flex-grow: 1;
-            padding: 10px;
-            border: 1px solid #ced4da;
-            border-radius: 20px;
+            padding: 10px 15px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
             font-size: 14px;
         }
         #send-button {
-            background-color: #3498db;
+            background-color: var(--primary-color);
             color: white;
             border: none;
             padding: 10px 20px;
             margin-left: 10px;
-            border-radius: 20px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 500;
             transition: background-color 0.3s;
         }
         #send-button:hover {
-            background-color: #2980b9;
+            background-color: var(--secondary-color);
         }
         .typing-indicator {
             padding: 10px;
-            background-color: #e9ecef;
-            border-radius: 18px;
+            background-color: #f3f4f6;
+            border-radius: 8px;
             margin-bottom: 15px;
             display: none;
             font-size: 14px;
@@ -100,17 +137,29 @@
     </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">
-            <h2>SupportSage AI Assistant</h2>
+    <div class="dashboard">
+        <div class="sidebar">
+            <div class="logo">SupportSage</div>
+            <div class="nav-item">Dashboard</div>
+            <div class="nav-item">Chat History</div>
+            <div class="nav-item">Settings</div>
         </div>
-        <div class="chat-messages" id="chat-messages">
-            <div class="message bot-message">Hello! I'm SupportSage, your AI customer support assistant. How can I help you today?</div>
-        </div>
-        <div class="typing-indicator" id="typing-indicator">SupportSage is thinking...</div>
-        <div class="chat-input">
-            <input type="text" id="user-input" placeholder="Type your question here...">
-            <button id="send-button">Send</button>
+        <div class="main-content">
+            <div class="header">
+                <h1>AI Assistant Dashboard</h1>
+            </div>
+            <div class="content">
+                <div class="chat-container">
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message bot-message">Welcome to SupportSage! How can I assist you today?</div>
+                    </div>
+                    <div class="typing-indicator" id="typing-indicator">SupportSage is thinking...</div>
+                    <div class="chat-input">
+                        <input type="text" id="user-input" placeholder="Type your message here...">
+                        <button id="send-button">Send</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
